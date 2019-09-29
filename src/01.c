@@ -39,6 +39,75 @@ int32_t part_a(int *items, size_t count) {
     return freq;
 }
 
+struct tree {
+    int val;
+    struct tree *left;
+    struct tree *right;
+};
+
+struct tree *tree_init(int val) {
+    struct tree *t = malloc(sizeof(struct tree));
+
+    t->val = val;
+    t->left = NULL;
+    t->right = NULL;
+
+    return t;
+}
+
+int tree_contains(struct tree *t, int val) {
+    if (t == NULL) {
+        return 0;
+    }
+
+    if (t->val == val) {
+        return 1;
+    }
+
+    if (t->val < val) {
+        return tree_contains(t->left, val);
+    } else {
+        return tree_contains(t->right, val);
+    }
+}
+
+void tree_add(struct tree *t, int val) {
+    if (t->val < val) {
+        if (t->left == NULL) {
+            struct tree *c = tree_init(val);
+            t->left = c;
+        } else {
+            tree_add(t->left, val);
+        }
+    } else {
+        if (t->right == NULL) {
+            struct tree *c = tree_init(val);
+            t->right = c;
+        } else {
+            tree_add(t->right, val);
+        }
+    }
+}
+
+int part_b(int *items, size_t count) {
+    int freq = 0;
+    struct tree *map = tree_init(freq);
+
+    for (size_t i = 0; ; i++) {
+        freq += *(items + (i % count));
+
+        if (tree_contains(map, freq)) {
+            return freq;
+        } else {
+            tree_add(map, freq);
+        }
+    }
+
+    return 0;
+}
+
+
+
 int main(int argc, char* argv[]) {
     int ret = 0;
 
@@ -75,6 +144,7 @@ int main(int argc, char* argv[]) {
     }
 
     printf("Part A: %d\n", part_a(items, count));
+    printf("Part B: %d\n", part_b(items, count));
 
 CLEANUP:
     free(blob);
