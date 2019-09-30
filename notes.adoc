@@ -1,0 +1,86 @@
+= Advent of code 2018 in C
+
+I've decided the time has come to learn some C. To do this, I'm going to run
+through last year's https://adventofcode.com/2018[Advent of Code] problems, and
+do them one by one in C. I'm learning as I go, so my first solutions will
+probably be horrifying, and as we go along they may or may not get better.
+
+I'm not a total beginner at C, though I am pretty close. I played a little with
+C++ for an undergrad course... euh... 12 years ago. I patched some bugs in the
+window manager I used around that time that was written in C. I've read K&R,
+leafed through some other books on C, and know enough to be able to read other
+people's C. But I'm very bad at writing it and want to be less bad at it.
+
+I'm going to take notes on how each day went, after the fact. I will *not* be
+doing one day of the advent per day; I have a family and am doing this in some
+very limited free time, and real-time is just not realistic.
+
+= Day 1: 2019-09-29
+
+The https://adventofcode.com/2018/day/1[first puzzle] is pretty simple. We have
+a list of integers, and need to sum it up in part A, and to find the first
+duplicate entry in the list of partial sums in part B.
+
+What pleasantly surprised me during part A was that writing a simple
+command-line interface to run my program wasn't hard at all. What I came up with
+isn't very robust, but it let me run my binary with
+
+----
+./build/01 source/01.txt
+----
+
+and have it just work. I've played with `getopt` in C before and not enjoyed the
+experience. This was pretty nice.
+
+It was fine to write this short program in vanilla Vim. My $300 Lenovo laptop
+would cry itself to death if I tried to fire up an IDE on it, but none of these
+programs should get big enough that Vim or Emacs can't deal with them
+comfortably.
+
+I'm also happy with the project structure that pretty much fell out while
+writing the program. Source files go into `src/`, build artifacts go into
+`build/`, there's a Makefile that does everything. Done. Some of my attempts at
+the advent of code haven't been this clean in, say, Python.
+
+There's not much to say about part A. I played it very lazy, more or less like I
+recall _21st century C_ advocating: I did a `stat` call to find out how big my
+input file was, read all of it into a buffer of that size, and (ab)used `strtok`
+to parse the result into lines that got fed into `atoi`. (Someone out there is
+screaming now.) That built up an array of integers I fed to a sum function, and
+we're done.
+
+Part B was more interesting. I first missed that we might have to loop multiple
+times over the input, and came up with a solution that allocated a fixed-size
+pointer to hold partial sums in, and checked on every addition whether the
+newest member was already in it (upon which we'd stop) or would go to the back
+of the list. It was `O(n^2)` in input, but I decided I wouldn't care until it
+ran too slowly. It was also wrong, so we needed something better.
+
+If I'd been writing Python (say), I'd have put the partial sums into a set and
+checked for collisions. I don't have a set structure in C, so I whipped up a
+simple ordered binary tree that would do for this case. The first time I ran it
+I got a segfault, but I found why within 10 seconds (experience, I guess? I
+remember spending hours looking for these kinds of mistakes back in the day) and
+got the right answer.
+
+It took a while to get that answer though, 19 seconds of balls-to-the-wall CPU
+use. Adding some code to poke at my binary tree suggests a plausible
+explanation: I never rebalance the tree, and as it eventually grows to contain
+143547 elements, its depth grows to 8999, while we should be able to get away
+with a depth of about `log_2 143547 ~= 17`. That's an awful long search of a
+simply linked list in some cases.
+
+I decided I'd let the solution stay as is though. For one, 19 seconds is not
+that much; I'm pretty sure it would take me longer than that to add rebalancing
+to the tree. I think it'll also be nice to let the code stay as it is so I can
+look back at it later and see how I've improved.
+
+Neither solution has any kind of automated tests. The nice thing about advent
+problems is that the statements come essentially with miniature test cases. I
+want to profit from that in future solutions.
+
+I didn't run any of this through static analysis, Valgrind, a profiler or gdb.
+I'd also like to explore all of those in the future.
+
+My Makefile will need some love at some point. It'll probably hold out for two
+or three more days though.
