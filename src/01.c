@@ -1,11 +1,11 @@
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
 #include <string.h>
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 
-off_t size(char* filename) {
+off_t size(char *filename) {
     struct stat buffer;
     int status = stat(filename, &buffer);
     if (status) {
@@ -15,14 +15,14 @@ off_t size(char* filename) {
     return buffer.st_size;
 }
 
-char *read_file(char* filename, off_t *bytes) {
+char *read_file(char *filename, off_t *bytes) {
     *bytes = size(filename);
     if (!*bytes) {
         fprintf(stderr, "Couldn't stat file\n");
         return NULL;
     }
 
-    char* blob = malloc(sizeof(char) * *bytes);
+    char *blob = malloc(sizeof(char) * *bytes);
     FILE *fh = fopen(filename, "r");
     fread(blob, sizeof(char), *bytes, fh);
     fclose(fh);
@@ -93,7 +93,7 @@ int part_b(int *items, size_t count) {
     int freq = 0;
     struct tree *map = tree_init(freq);
 
-    for (size_t i = 0; ; i++) {
+    for (size_t i = 0;; i++) {
         freq += *(items + (i % count));
 
         if (tree_contains(map, freq)) {
@@ -106,9 +106,7 @@ int part_b(int *items, size_t count) {
     return 0;
 }
 
-
-
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     int ret = 0;
 
     off_t len = 0;
@@ -132,7 +130,7 @@ int main(int argc, char* argv[]) {
     // Parse file contents
     char *token, *str;
     size_t i = 0;
-    for (str = blob; ; str = NULL) {
+    for (str = blob;; str = NULL) {
         token = strtok(str, "\n");
         if (token == NULL) {
             break;
