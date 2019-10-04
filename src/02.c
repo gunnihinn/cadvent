@@ -67,6 +67,24 @@ uint8_t count_repeats(char *line, size_t len) {
     return mask;
 }
 
+uint32_t part_a(char** items, int count) {
+    int32_t two = 0;
+    int32_t three = 0;
+    for (size_t i = 0; i < count; i++) {
+        char *line = *(items + i);
+        uint8_t count = count_repeats(line, 27);
+
+        if (count & HAS_PAIR) {
+            two++;
+        }
+        if (count & HAS_TRIPLE) {
+            three++;
+        }
+    }
+
+    return two * three;
+}
+
 int main(int argc, char *argv[]) {
     int ret = 0;
 
@@ -98,21 +116,7 @@ int main(int argc, char *argv[]) {
         i++;
     }
 
-    int32_t two = 0;
-    int32_t three = 0;
-    for (size_t i = 0; i < count; i++) {
-        char *line = *(items + i);
-        uint8_t count = count_repeats(line, 27);
-
-        if (count & HAS_PAIR) {
-            two++;
-        }
-        if (count & HAS_TRIPLE) {
-            three++;
-        }
-    }
-
-    printf("Part A: %d\n", two * three);
+    printf("Part A: %d\n", part_a(items, count));
 
 CLEANUP:
     free(blob);
