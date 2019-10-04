@@ -67,7 +67,7 @@ uint8_t count_repeats(char *line, size_t len) {
     return mask;
 }
 
-uint32_t part_a(char** items, int count) {
+uint32_t part_a(char **items, int count) {
     int32_t two = 0;
     int32_t three = 0;
     for (size_t i = 0; i < count; i++) {
@@ -83,6 +83,45 @@ uint32_t part_a(char** items, int count) {
     }
 
     return two * three;
+}
+
+// Input: strings left and right, buffer to put common substring into.
+// Output: length of common substring.
+uint8_t common(char *left, char *right, char *common) {
+    uint8_t len = 0;
+
+    for (size_t i = 0; i < 27; i++) {
+        if (*left == *right) {
+            *common = *left;
+            common++;
+            len++;
+        }
+
+        left++;
+        right++;
+    }
+
+    *common = '\0';
+
+    return len;
+}
+
+char *part_b(char **items, int count) {
+    char *buf = malloc(28 * sizeof(char));
+    char *zero = calloc(sizeof(char), 28);
+
+    for (size_t i = 0; i < count; i++) {
+        for (size_t j = i + 1; j < count; j++) {
+            memcpy(buf, zero, 28);
+            uint8_t len = common(*(items + i), *(items + j), buf);
+            if (len == 26) {
+                free(zero);
+                return buf;
+            }
+        }
+    }
+
+    return NULL;
 }
 
 int main(int argc, char *argv[]) {
@@ -118,8 +157,14 @@ int main(int argc, char *argv[]) {
 
     printf("Part A: %d\n", part_a(items, count));
 
+    char *buf = part_b(items, count);
+    if (buf) {
+        printf("Part B: %s\n", buf);
+    }
+
 CLEANUP:
     free(blob);
+    free(buf);
 
     return ret;
 }
