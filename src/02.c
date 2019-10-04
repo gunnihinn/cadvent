@@ -5,6 +5,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#define ALPHABET 26
+#define LEN 27
+
 off_t size(char *filename) {
     struct stat buffer;
     int status = stat(filename, &buffer);
@@ -51,12 +54,12 @@ const uint8_t HAS_TRIPLE = 1 << 1;
 uint8_t count_repeats(char *line, size_t len) {
     uint8_t mask = 0;
 
-    char letters[26] = {0};
+    char letters[ALPHABET] = {0};
     for (size_t i = 0; i < len; i++) {
         letters[*(line + i) - 'a']++;
     }
 
-    for (size_t i = 0; i < 26; i++) {
+    for (size_t i = 0; i < ALPHABET; i++) {
         if (letters[i] == 2) {
             mask |= HAS_PAIR;
         } else if (letters[i] == 3) {
@@ -72,7 +75,7 @@ uint32_t part_a(char **items, int count) {
     int32_t three = 0;
     for (size_t i = 0; i < count; i++) {
         char *line = *(items + i);
-        uint8_t count = count_repeats(line, 27);
+        uint8_t count = count_repeats(line, LEN);
 
         if (count & HAS_PAIR) {
             two++;
@@ -90,7 +93,7 @@ uint32_t part_a(char **items, int count) {
 uint8_t common(char *left, char *right, char *common) {
     uint8_t len = 0;
 
-    for (size_t i = 0; i < 27; i++) {
+    for (size_t i = 0; i < LEN; i++) {
         if (*left == *right) {
             *common = *left;
             common++;
@@ -107,14 +110,14 @@ uint8_t common(char *left, char *right, char *common) {
 }
 
 char *part_b(char **items, int count) {
-    char *buf = malloc(28 * sizeof(char));
-    char *zero = calloc(sizeof(char), 28);
+    char *buf = malloc((LEN + 1) * sizeof(char));
+    char *zero = calloc(sizeof(char), (LEN + 1));
 
     for (size_t i = 0; i < count; i++) {
         for (size_t j = i + 1; j < count; j++) {
-            memcpy(buf, zero, 28);
+            memcpy(buf, zero, (LEN + 1));
             uint8_t len = common(*(items + i), *(items + j), buf);
-            if (len == 26) {
+            if (len == LEN - 1) {
                 free(zero);
                 return buf;
             }
